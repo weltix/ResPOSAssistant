@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'key0'
+            keyPassword '0987654321'
+            storeFile file('../app/res.jks')
+            storePassword '1234567890'
+        }
+        debug {
+            keyAlias 'key0'
+            keyPassword '0987654321'
+            storeFile file('../app/res.jks')
+            storePassword '1234567890'
+        }
+    }
+
+    compileSdkVersion 26
+    buildToolsVersion "28.0.3"
+    defaultConfig {
+        applicationId "com.respos.android.assistant"
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1400100
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.sunmi:sunmiui:latest.release'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
+}
+
+apply plugin: 'com.google.gms.google-services'
