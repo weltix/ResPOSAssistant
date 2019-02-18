@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.respos.android.assistant.service.ServerService;
+import com.respos.android.assistant.service.ResPOSAssistantService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        Intent pushIntent = new Intent(this, ServerService.class);
+        Intent pushIntent = new Intent(this, ResPOSAssistantService.class);
         startService(pushIntent);
 
         finish();

@@ -11,13 +11,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.respos.android.assistant.Constants;
-import com.respos.android.assistant.service.ServerService;
+import com.respos.android.assistant.service.ResPOSAssistantService;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
 
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            Intent pushIntent = new Intent(context, ServerService.class);
+            Intent pushIntent = new Intent(context, ResPOSAssistantService.class);
             context.startService(pushIntent);
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);

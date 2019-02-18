@@ -6,8 +6,6 @@ public class AnotherAndroidDevice extends AndroidDeviceAbstractClass {
 
     private int indicatorLineLenght = 20;       //default value for any device
 
-    private Context context;
-
     public AnotherAndroidDevice(Context context) {
         this.context = context;
     }
@@ -18,6 +16,10 @@ public class AnotherAndroidDevice extends AndroidDeviceAbstractClass {
 
     @Override
     public void finish() {
+    }
+
+    @Override
+    public void sendDataToPrinter(byte[] byteArray) {
     }
 
     @Override

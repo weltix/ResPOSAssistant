@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.ServerService" />
+        <service android:name=".service.ResPOSAssistantService" />
 
         <receiver android:name=".receiver.BootCompletedReceiver">
             <intent-filter>

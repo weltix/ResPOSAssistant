@@ -12,8 +12,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.respos.android.assistant.R;
-import com.respos.android.assistant.utils.AidlUtil;
-import com.respos.android.assistant.utils.ESCUtil;
+import com.respos.android.assistant.service.ResPOSAssistantService;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -25,9 +24,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class TCPIPPrintServer {
-    public static final int SERVER_PORT = 9100;             // классика от Hewlett-Packard для сетевых принтеров
-    public static final byte CHARSET_CP866 = (byte) 17;     // из документации к принтеру
-    public static final int clientSocketTimeOut = 500;
+    private static final int SERVER_PORT;
+    private static final int clientSocketTimeOut;
     public static final String TAG = "PrintServer";
     private boolean running = false;                        // флаг для проверки, запущен ли сервер
     private static Context context;
@@ -35,7 +33,7 @@ public class TCPIPPrintServer {
     private static Thread workingThread;
     private static Server server;
 
-    public TCPIPPrintServer(Context context) {
+    public TCPIPPrintServer(Context context, ) {
         this.context = context;
         createServerSocket();
     }
@@ -105,8 +103,8 @@ public class TCPIPPrintServer {
                     createServerSocket();
                 runServer();
             } catch (Exception e) {
-                Crashlytics.log("Exception in TCPIPServer.Server.run() " + e.toString());
-                Crashlytics.log("TCPIPServer.serverSocket.isClosed() = " + String.valueOf(serverSocket.isClosed()));
+                Crashlytics.log("Exception in TCPIPPrintServer.Server.run() " + e.toString());
+                Crashlytics.log("TCPIPPrintServer.serverSocket.isClosed() = " + String.valueOf(serverSocket.isClosed()));
                 Crashlytics.logException(e);
                 Log.d(TAG, e.toString());
                 e.printStackTrace();
@@ -120,7 +118,7 @@ public class TCPIPPrintServer {
 
         private boolean incomeDataProcessing() {
             if (byteArrayOutputStream.size() > 0) {
-                printByteArray(byteArrayOutputStream.toByteArray());
+                ResPOSAssistantService.androidDevice.sendDataToPrinter(byteArrayOutputStream.toByteArray());
                 try {
                     out.write("OK");
                     out.flush();
@@ -148,21 +146,12 @@ public class TCPIPPrintServer {
 
     public void stopServer() {
         running = false;
-        Crashlytics.log("TCPIPServer.stopServer() have been called from ServerService.onDestroy()");
+        Crashlytics.log("TCPIPPrintServer.stopServer() called");
         try {
             serverSocket.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void printByteArray(byte[] outputByteArray) {
-//        AidlUtil.getInstance().initPrinter();
-        AidlUtil.getInstance().sendRawData(ESCUtil.singleByte());
-        AidlUtil.getInstance().sendRawData(ESCUtil.setCodeSystemSingle(CHARSET_CP866));
-        AidlUtil.getInstance().sendRawData(outputByteArray);
-        AidlUtil.getInstance().openDrawer();
-//        Log.d(TCPIPPrintServer.TAG, "byteArray: " + BytesUtil.getHexStringFromBytes(outputByteArray));
     }
 
     private static void callBindExceptionToast(final String message, int repeatTimes) {

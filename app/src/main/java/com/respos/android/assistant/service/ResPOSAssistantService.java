@@ -23,18 +23,21 @@ import android.widget.Toast;
 
 import com.respos.android.assistant.R;
 import com.respos.android.assistant.activity.MainActivity;
-import com.respos.android.assistant.network.TCPIPPrintServer;
-import com.respos.android.assistant.utils.AidlUtil;
+import com.respos.android.assistant.device.android.AndroidDeviceAbstractClass;
+import com.respos.android.assistant.device.android.AnotherAndroidDevice;
+import com.respos.android.assistant.device.android.SunmiT1MiniG;
 
 import java.util.List;
 
 import static com.respos.android.assistant.Constants.RESPOS_PACKAGE_NAME;
+import static com.respos.android.assistant.device.android.AndroidDeviceAbstractClass.ANDROID_DEVICE_NAME;
+import static com.respos.android.assistant.device.android.AndroidDeviceAbstractClass.SUNMI_T1MINI_G;
 
-public class ServerService extends Service {
+public class ResPOSAssistantService extends Service {
 
     public static final int NOTIFICATION_ID_1 = 001;
     public static final String NOTIFICATION_CHANNEL_ID = "com.respos.android.assistant";
-    public static TCPIPPrintServer printServer;
+    public static AndroidDeviceAbstractClass androidDevice = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -44,6 +47,16 @@ public class ServerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        switch (ANDROID_DEVICE_NAME) {
+            case SUNMI_T1MINI_G:
+                androidDevice = new SunmiT1MiniG(this);
+                break;
+            default:
+                androidDevice = new AnotherAndroidDevice(this);
+                break;
+        }
+        androidDevice.init();
     }
 
     @Override
@@ -54,12 +67,6 @@ public class ServerService extends Service {
 
         Toast.makeText(this, getString(R.string.notification_id_1_ticker), Toast.LENGTH_LONG).show();
 
-        if (printServer == null) {
-            AidlUtil.getInstance().connectPrinterService(this);
-            printServer = new TCPIPPrintServer(this);
-            printServer.runServer();
-        }
-
         updateResPosAutoBootInfo();
 
         return START_STICKY;
@@ -68,11 +75,8 @@ public class ServerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (printServer != null) {
-            printServer.stopServer();
-            printServer = null;
-        }
-        AidlUtil.getInstance().disconnectPrinterService(this);
+
+        androidDevice.finish();
     }
 
     private NotificationCompat.Builder notificationBuilder() {
@@ -84,7 +88,7 @@ public class ServerService extends Service {
         builder
                 .setContentTitle(this.getString(R.string.app_name))
                 .setStyle(new NotificationCompat.BigTextStyle()
-                .bigText(this.getString(R.string.notification_id_1_subtitle)))
+                        .bigText(this.getString(R.string.notification_id_1_subtitle)))
                 .setTicker(this.getString(R.string.notification_id_1_ticker))
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setSmallIcon(R.drawable.ic_notification_id_1)

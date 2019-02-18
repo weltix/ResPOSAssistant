@@ -1,5 +1,6 @@
 package com.respos.android.assistant.device.android;
 
+import android.content.Context;
 import android.os.Build;
 
 public abstract class AndroidDeviceAbstractClass {
@@ -7,14 +8,16 @@ public abstract class AndroidDeviceAbstractClass {
     public static final String SUNMI_T1MINI_G = "SUNMI T1MINI-G";
 
     public static final String ANDROID_DEVICE_NAME = AndroidDeviceAbstractClass.getDeviceName().toUpperCase();
-    public static final String ANDROID_DEVICE_MANUFACTURER = AndroidDeviceAbstractClass.getDeviceManufacturer().toUpperCase();
-    public static final String ANDROID_DEVICE_MODEL = AndroidDeviceAbstractClass.getDeviceModel().toUpperCase();
+
+    Context context;
 
     public abstract void init();
 
     public abstract void finish();
 
-    public abstract void sendDataToIndicator(String str);
+    public abstract void sendDataToPrinter(byte[] byteArray);
+
+    public abstract void sendDataToIndicator(String string);
 
     public abstract int getIndicatorLineLength();
 
@@ -26,16 +29,6 @@ public abstract class AndroidDeviceAbstractClass {
         } else {
             return capitalize(manufacturer) + " " + model;
         }
-    }
-
-    private static String getDeviceManufacturer() {
-        String manufacturer = Build.MANUFACTURER;
-        return capitalize(manufacturer);
-    }
-
-    private static String getDeviceModel() {
-        String model = Build.MODEL;
-        return capitalize(model);
     }
 
     private static String capitalize(String s) {
