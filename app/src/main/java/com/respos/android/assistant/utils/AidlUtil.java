@@ -1,6 +1,6 @@
 /*
  *  Changed RESONANCE JSC, Bludov Dmitriy
- *  private void callToast();    13.08.2019
+ *  private void callToastPrinterUnavailable();    13.08.2019
  *  public void openDrawer();    21.01.2019
  */
 
@@ -122,7 +122,7 @@ public class AidlUtil {
 
     public void setDarkness(int index) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -142,7 +142,7 @@ public class AidlUtil {
      */
     public List<String> getPrinterInfo() {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return null;
         }
 
@@ -179,7 +179,7 @@ public class AidlUtil {
      */
     public void initPrinter() {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -195,7 +195,7 @@ public class AidlUtil {
      */
     public void printQr(String data, int modulesize, int errorlevel) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -214,7 +214,7 @@ public class AidlUtil {
      */
     public void printBarCode(String data, int symbology, int height, int width, int textposition) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -232,7 +232,7 @@ public class AidlUtil {
      */
     public void printText(String content, float size, boolean isBold, boolean isUnderLine) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -262,7 +262,7 @@ public class AidlUtil {
      */
     public void printBitmap(Bitmap bitmap) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -280,7 +280,7 @@ public class AidlUtil {
      */
     public void printBitmap(Bitmap bitmap, int orientation) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -308,7 +308,7 @@ public class AidlUtil {
      */
     public void printTable(LinkedList<TableItem> list) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -328,7 +328,7 @@ public class AidlUtil {
      */
     public void print3Line() {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -341,7 +341,7 @@ public class AidlUtil {
 
     public void sendRawData(byte[] data) {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -355,7 +355,7 @@ public class AidlUtil {
     //Get the current print mode
     public int getPrintMode() {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return -1;
         }
 
@@ -374,7 +374,7 @@ public class AidlUtil {
      */
     public void openDrawer() {
         if (woyouService == null) {
-            callToast();
+            callToastPrinterUnavailable();
             return;
         }
 
@@ -385,14 +385,15 @@ public class AidlUtil {
         }
     }
 
-    public void sendLCDCommandClear() {
+
+    public void initLCD() {
         if (woyouService == null) {
-            callToast();
+            callToastIndicatorUnavailable();
             return;
         }
 
         try {
-            woyouService.sendLCDCommand(4);
+            woyouService.sendLCDCommand(1);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -400,7 +401,7 @@ public class AidlUtil {
 
     public void sendLCDCommandSleep() {
         if (woyouService == null) {
-            callToast();
+            callToastIndicatorUnavailable();
             return;
         }
 
@@ -413,7 +414,7 @@ public class AidlUtil {
 
     public void sendLCDDoubleString(String str1, String str2) {
         if (woyouService == null) {
-            callToast();
+            callToastIndicatorUnavailable();
             return;
         }
 
@@ -427,7 +428,7 @@ public class AidlUtil {
 
     public void sendLCDBitmap(Bitmap bmp) {
         if (woyouService == null) {
-            callToast();
+            callToastIndicatorUnavailable();
             return;
         }
 
@@ -439,11 +440,21 @@ public class AidlUtil {
         }
     }
 
-    private void callToast() {
+
+    private void callToastPrinterUnavailable() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, R.string.toast_2, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, R.string.toast_sunmi_printer_unavailable, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void callToastIndicatorUnavailable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, R.string.toast_sunmi_indicator_unavailable, Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -3,9 +3,6 @@ package com.respos.android.assistant.device.android;
 import android.content.Context;
 
 public class AnotherAndroidDevice extends AndroidDeviceAbstractClass {
-
-    private int indicatorLineLenght = 20;       //default value for any device
-
     public AnotherAndroidDevice(Context context) {
         this.context = context;
     }
@@ -17,18 +14,4 @@ public class AnotherAndroidDevice extends AndroidDeviceAbstractClass {
     @Override
     public void finish() {
     }
-
-    @Override
-    public void sendDataToPrinter(byte[] byteArray) {
-    }
-
-    @Override
-    public void sendDataToIndicator(String str) {
-    }
-
-    @Override
-    public int getIndicatorLineLength() {
-        return indicatorLineLenght;
-    }
-    
 }

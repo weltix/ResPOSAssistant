@@ -25,19 +25,20 @@ import com.respos.android.assistant.R;
 import com.respos.android.assistant.activity.MainActivity;
 import com.respos.android.assistant.device.android.AndroidDeviceAbstractClass;
 import com.respos.android.assistant.device.android.AnotherAndroidDevice;
+import com.respos.android.assistant.device.android.CitaqH14;
 import com.respos.android.assistant.device.android.SunmiT1MiniG;
 
 import java.util.List;
 
 import static com.respos.android.assistant.Constants.RESPOS_PACKAGE_NAME;
 import static com.respos.android.assistant.device.android.AndroidDeviceAbstractClass.ANDROID_DEVICE_NAME;
+import static com.respos.android.assistant.device.android.AndroidDeviceAbstractClass.CITAQ_H14;
 import static com.respos.android.assistant.device.android.AndroidDeviceAbstractClass.SUNMI_T1MINI_G;
 
 public class ResPOSAssistantService extends Service {
-
-    public static final int NOTIFICATION_ID_1 = 001;
-    public static final String NOTIFICATION_CHANNEL_ID = "com.respos.android.assistant";
-    public static AndroidDeviceAbstractClass androidDevice = null;
+    private static final int NOTIFICATION_ID_1 = 001;
+    private static final String NOTIFICATION_CHANNEL_ID = "com.respos.android.assistant";
+    private static AndroidDeviceAbstractClass androidDevice = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,25 +46,25 @@ public class ResPOSAssistantService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-
-        switch (ANDROID_DEVICE_NAME) {
-            case SUNMI_T1MINI_G:
-                androidDevice = new SunmiT1MiniG(this);
-                break;
-            default:
-                androidDevice = new AnotherAndroidDevice(this);
-                break;
-        }
-        androidDevice.init();
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createNotificationChannel();
         startForeground(NOTIFICATION_ID_1, notificationBuilder().build());
+
+        if (androidDevice == null) {
+            switch (ANDROID_DEVICE_NAME) {
+                case SUNMI_T1MINI_G:
+                    androidDevice = new SunmiT1MiniG(this);
+                    break;
+                case CITAQ_H14:
+                    androidDevice = new CitaqH14(this);
+                    break;
+                default:
+                    androidDevice = new AnotherAndroidDevice(this);
+                    break;
+            }
+            androidDevice.init();
+        }
 
         Toast.makeText(this, getString(R.string.notification_id_1_ticker), Toast.LENGTH_LONG).show();
 
@@ -76,7 +77,8 @@ public class ResPOSAssistantService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        androidDevice.finish();
+        if (androidDevice != null)
+            androidDevice.finish();
     }
 
     private NotificationCompat.Builder notificationBuilder() {

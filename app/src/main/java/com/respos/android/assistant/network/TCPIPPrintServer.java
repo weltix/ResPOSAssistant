@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.respos.android.assistant.R;
-import com.respos.android.assistant.service.ResPOSAssistantService;
+import com.respos.android.assistant.device.POSPrinter;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -23,26 +23,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-public class TCPIPPrintServer {
-    private static final int SERVER_PORT;
-    private static final int clientSocketTimeOut;
-    public static final String TAG = "PrintServer";
-    private boolean running = false;                        // флаг для проверки, запущен ли сервер
-    private static Context context;
-    private static ServerSocket serverSocket;
-    private static Thread workingThread;
-    private static Server server;
+import static com.respos.android.assistant.Constants.TAG;
 
-    public TCPIPPrintServer(Context context, ) {
+public class TCPIPPrintServer {
+    private Context context;
+    private POSPrinter posPrinter;
+    private ServerSocket serverSocket;
+    private int serverSocketPort;
+    private int clientSocketTimeout;
+    private boolean running = false;                        // флаг для проверки, запущен ли сервер
+
+    public TCPIPPrintServer(Context context, POSPrinter posPrinter, int serverSocketPort, int clientSocketTimeout) {
         this.context = context;
+        this.serverSocketPort = serverSocketPort;
+        this.clientSocketTimeout = clientSocketTimeout;
+        this.posPrinter = posPrinter;
         createServerSocket();
     }
 
-    private static void createServerSocket() {
+    private void createServerSocket() {
         try {
-            serverSocket = new ServerSocket(TCPIPPrintServer.SERVER_PORT);
+            serverSocket = new ServerSocket(serverSocketPort);
         } catch (IOException e) {
-            Crashlytics.log("Try to create new ServerSocket. " + e.toString());
+            Crashlytics.log("Try to create new ServerSocket on port " + serverSocketPort + ". " + e.toString());
             Crashlytics.logException(e);
             Log.d(TAG, e.toString());
             e.printStackTrace();
@@ -52,23 +55,23 @@ public class TCPIPPrintServer {
 
     class Server implements Runnable {
         private Socket client;
-        private BufferedWriter out;
+        private BufferedWriter outputStream;
         private ByteArrayOutputStream byteArrayOutputStream;
 
         @Override
         public void run() {
             try {
-                Log.d(TAG, String.format("listening on port = %d", SERVER_PORT));
+                Log.d(TAG, String.format("listening on port = %d", serverSocketPort));
                 while (running) {
                     Log.d(TAG, "waiting for client");
                     client = serverSocket.accept();
                     Log.d(TAG, String.format("client connected from: %s", client.getRemoteSocketAddress().toString()));
                     // close Socket anyway after some time if inputStream.read() doesn't occur
                     // to prevent ServerSocket hanging out in forever waiting
-                    client.setSoTimeout(clientSocketTimeOut);
+                    client.setSoTimeout(clientSocketTimeout);
 
                     InputStream inputStream = client.getInputStream();
-                    out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+                    outputStream = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
                     byteArrayOutputStream = new ByteArrayOutputStream();
 
                     int readBytesAmount;
@@ -90,14 +93,14 @@ public class TCPIPPrintServer {
             } catch (SocketTimeoutException e) {
                 try {
                     if (!incomeDataProcessing()) {
-                        out.write("SocketTimeoutException (no data to receive)");
-                        out.flush();
+                        outputStream.write("SocketTimeoutException (no data to receive)");
+                        outputStream.flush();
                     }
                     client.close();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                Log.d(TAG, String.format("%s (%d ms)", e.toString(), clientSocketTimeOut));
+                Log.d(TAG, String.format("%s (%d ms)", e.toString(), clientSocketTimeout));
                 e.printStackTrace();
                 if (serverSocket == null || serverSocket.isClosed())        // though usually ServerSocket is still valid
                     createServerSocket();
@@ -105,6 +108,7 @@ public class TCPIPPrintServer {
             } catch (Exception e) {
                 Crashlytics.log("Exception in TCPIPPrintServer.Server.run() " + e.toString());
                 Crashlytics.log("TCPIPPrintServer.serverSocket.isClosed() = " + String.valueOf(serverSocket.isClosed()));
+                Crashlytics.log("Port: " + serverSocketPort);
                 Crashlytics.logException(e);
                 Log.d(TAG, e.toString());
                 e.printStackTrace();
@@ -118,10 +122,10 @@ public class TCPIPPrintServer {
 
         private boolean incomeDataProcessing() {
             if (byteArrayOutputStream.size() > 0) {
-                ResPOSAssistantService.androidDevice.sendDataToPrinter(byteArrayOutputStream.toByteArray());
+                String printResult = posPrinter.sendDataToPrinter(byteArrayOutputStream.toByteArray());
                 try {
-                    out.write("OK");
-                    out.flush();
+                    outputStream.write(printResult);
+                    outputStream.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -135,9 +139,7 @@ public class TCPIPPrintServer {
         if (serverSocket != null) {
             running = true;
             try {
-                server = new Server();
-                workingThread = new Thread(server);
-                workingThread.start();
+                new Thread(new Server()).start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -154,7 +156,7 @@ public class TCPIPPrintServer {
         }
     }
 
-    private static void callBindExceptionToast(final String message, int repeatTimes) {
+    private void callBindExceptionToast(final String message, int repeatTimes) {
         for (int i = 0; i < repeatTimes; i++) {
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {

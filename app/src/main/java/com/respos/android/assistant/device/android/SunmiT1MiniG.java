@@ -3,20 +3,21 @@ package com.respos.android.assistant.device.android;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import com.respos.android.assistant.R;
+import com.respos.android.assistant.device.Indicator;
+import com.respos.android.assistant.device.POSPrinter;
 import com.respos.android.assistant.network.TCPIPPrintServer;
 import com.respos.android.assistant.utils.AidlUtil;
 import com.respos.android.assistant.utils.ESCUtil;
 
-public class SunmiT1MiniG extends AndroidDeviceAbstractClass {
+public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrinter, Indicator {
+    private static final int INDICATOR_LINE_LENGTH = 16;
 
-    private static final int indicatorLineLenght = 16;
-    public static final int SERVER_PORT = 9100;             // классика от Hewlett-Packard для сетевых принтеров
-    public static final int clientSocketTimeOut = 500;
-    public static final byte CHARSET_CP866 = (byte) 17;     // from printer's documentation
-    public static TCPIPPrintServer printServer;
+    private static final int SERVER_SOCKET_PORT = 9100;             // arbitrary port for inner printer
+    private static final int CLIENT_SOCKET_TIMEOUT = 500;
+    private static TCPIPPrintServer printServer = null;      // data to print we get from TCP/IP Server
+    private static final byte PRINTER_CHARSET_CP866 = (byte) 17;     // from printer's documentation
 
     private Bitmap logoLCD;
 
@@ -31,18 +32,11 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass {
     @Override
     public void init() {
         AidlUtil.getInstance().connectPrinterService(context);
-        printServer = new TCPIPPrintServer(context, SunmiT1MiniG.this, SERVER_PORT, clientSocketTimeOut);
-        printServer.runServer();
-        sendLCDBitmapWithDelay(logoLCD, 1000);       //show ResPOS logo on indicator
-    }
-
-    @Override
-    public void sendDataToPrinter(byte[] byteArray) {
-        AidlUtil.getInstance().sendRawData(ESCUtil.singleByte());
-        AidlUtil.getInstance().sendRawData(ESCUtil.setCodeSystemSingle(CHARSET_CP866));
-        AidlUtil.getInstance().sendRawData(byteArray);
-        AidlUtil.getInstance().openDrawer();
-//        Log.d(TCPIPPrintServer.TAG, "byteArray: " + BytesUtil.getHexStringFromBytes(outputByteArray));
+        if (printServer == null) {
+            printServer = new TCPIPPrintServer(context, this, SERVER_SOCKET_PORT, CLIENT_SOCKET_TIMEOUT);
+            printServer.runServer();
+        }
+        initDevicesWithDelay(logoLCD, 1000);       //show ResPOS logo on indicator
     }
 
     @Override
@@ -57,42 +51,40 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass {
     }
 
     @Override
+    public String sendDataToPrinter(byte[] byteArray) {
+        AidlUtil.getInstance().sendRawData(ESCUtil.singleByte());
+        AidlUtil.getInstance().sendRawData(ESCUtil.setCodeSystemSingle(PRINTER_CHARSET_CP866));
+        AidlUtil.getInstance().sendRawData(byteArray);
+        AidlUtil.getInstance().openDrawer();
+//        Log.d(TAG, "SunmiT1MiniG.sendDataToPrinter byteArray: " + BytesUtil.getHexStringFromBytes(byteArray));
+        return "OK";
+    }
+
+    @Override
     public void sendDataToIndicator(String str) {
         int lineLength = str.length() / 2;
         String str1 = str.substring(0, lineLength);
         String str2 = str.substring(lineLength, lineLength * 2);
         AidlUtil.getInstance().sendLCDDoubleString(str1, str2);
-        Log.d("python", "SunmiT1MiniG.sendDataToIndicator=\"" + str1 + "\"+\"" + str2 + "\" lineLength=" + lineLength);
+//        Log.d(TAG, "SunmiT1MiniG.sendDataToIndicator=\"" + str1 + "\"+\"" + str2 + "\" lineLength=" + lineLength);
     }
 
     @Override
     public int getIndicatorLineLength() {
-        return indicatorLineLenght;
+        return INDICATOR_LINE_LENGTH;
     }
 
-    public void sendLCDBitmapWithDelay(Bitmap bitmap, int delayMs) {
-        new Thread(new ShowBitmapWithDelay(bitmap, delayMs)).start();
-    }
-
-    // Class shows image with delay, cos it is need some time to connect to AIDL service
-    class ShowBitmapWithDelay implements Runnable {
-        private Bitmap bitmap;
-        private int delayMs;
-
-        public ShowBitmapWithDelay(Bitmap bitmap, int delayMs) {
-            this.bitmap = bitmap;
-            this.delayMs = delayMs;
-        }
-
-        public void run() {
+    // it is need some time to connect to AIDL service before init
+    public void initDevicesWithDelay(Bitmap bitmap, int delayMs) {
+        new Thread(() -> {
             try {
                 Thread.sleep(delayMs);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            AidlUtil.getInstance().initPrinter();
+            AidlUtil.getInstance().initLCD();
             AidlUtil.getInstance().sendLCDBitmap(bitmap);
-            AidlUtil.getInstance().initPrinter();   // also init printer after AIDL service starting
-        }
+        }).start();
     }
-
 }

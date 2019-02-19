@@ -6,6 +6,7 @@ import android.os.Build;
 public abstract class AndroidDeviceAbstractClass {
 
     public static final String SUNMI_T1MINI_G = "SUNMI T1MINI-G";
+    public static final String CITAQ_H14 = "CITAQ H14";
 
     public static final String ANDROID_DEVICE_NAME = AndroidDeviceAbstractClass.getDeviceName().toUpperCase();
 
@@ -14,12 +15,6 @@ public abstract class AndroidDeviceAbstractClass {
     public abstract void init();
 
     public abstract void finish();
-
-    public abstract void sendDataToPrinter(byte[] byteArray);
-
-    public abstract void sendDataToIndicator(String string);
-
-    public abstract int getIndicatorLineLength();
 
     private static String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;

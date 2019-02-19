@@ -10,4 +10,5 @@ public final class Constants {
     }
 
     public static final String RESPOS_PACKAGE_NAME = "ResPOS package name";
+    public static final String TAG = "respos_assistant";
 }
