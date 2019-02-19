@@ -57,7 +57,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrint
         AidlUtil.getInstance().sendRawData(byteArray);
         AidlUtil.getInstance().openDrawer();
 //        Log.d(TAG, "SunmiT1MiniG.sendDataToPrinter byteArray: " + BytesUtil.getHexStringFromBytes(byteArray));
-        return "OK";
+        return "OK\n";
     }
 
     @Override

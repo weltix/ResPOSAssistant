@@ -78,9 +78,10 @@ public class TCPIPPrintServer {
                     byte[] inputByteArray = new byte[32768];  // хватит для 1024 строк по 32 символа (около 4м ленты)
                     while ((readBytesAmount = inputStream.read(inputByteArray, 0, inputByteArray.length)) != -1) {
                         byteArrayOutputStream.write(inputByteArray, 0, readBytesAmount);
+//                        incomeDataProcessing();          // return true if any data was received, or false if input stream was empty
+//                        byteArrayOutputStream.reset();   // clear byteArrayOutputStream after every iteration
                     }
-
-                    incomeDataProcessing();     //return true if any data was received, or false if input stream was empty
+                    incomeDataProcessing();   // other variant is to collect all bytes and process them here
 
                     try {
                         client.close();
@@ -93,7 +94,7 @@ public class TCPIPPrintServer {
             } catch (SocketTimeoutException e) {
                 try {
                     if (!incomeDataProcessing()) {
-                        outputStream.write("SocketTimeoutException (no data to receive)");
+                        outputStream.write("SocketTimeoutException (no data to receive)\n");
                         outputStream.flush();
                     }
                     client.close();
