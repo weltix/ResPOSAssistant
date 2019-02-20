@@ -442,20 +442,14 @@ public class AidlUtil {
 
 
     private void callToastPrinterUnavailable() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, R.string.toast_sunmi_printer_unavailable, Toast.LENGTH_LONG).show();
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(
+                () -> Toast.makeText(context, R.string.toast_sunmi_printer_unavailable, Toast.LENGTH_LONG).show()
+        );
     }
 
     private void callToastIndicatorUnavailable() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, R.string.toast_sunmi_indicator_unavailable, Toast.LENGTH_LONG).show();
-            }
-        });
+        new Handler(Looper.getMainLooper()).post(
+                () -> Toast.makeText(context, R.string.toast_sunmi_indicator_unavailable, Toast.LENGTH_LONG).show()
+        );
     }
 }

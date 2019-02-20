@@ -36,7 +36,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrint
             printServer = new TCPIPPrintServer(context, this, SERVER_SOCKET_PORT, CLIENT_SOCKET_TIMEOUT);
             printServer.runServer();
         }
-        initDevicesWithDelay(logoLCD, 1000);       //show ResPOS logo on indicator
+        initInnerDevices(1000);       //show ResPOS logo on indicator
     }
 
     @Override
@@ -75,7 +75,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrint
     }
 
     // it is need some time to connect to AIDL service before init
-    public void initDevicesWithDelay(Bitmap bitmap, int delayMs) {
+    public void initInnerDevices(int delayMs) {
         new Thread(() -> {
             try {
                 Thread.sleep(delayMs);
@@ -84,7 +84,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrint
             }
             AidlUtil.getInstance().initPrinter();
             AidlUtil.getInstance().initLCD();
-            AidlUtil.getInstance().sendLCDBitmap(bitmap);
+            AidlUtil.getInstance().sendLCDBitmap(logoLCD);
         }).start();
     }
 }

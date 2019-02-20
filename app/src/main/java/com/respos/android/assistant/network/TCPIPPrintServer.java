@@ -54,7 +54,7 @@ public class TCPIPPrintServer {
     }
 
     class Server implements Runnable {
-        private Socket client;
+        private Socket clientSocket;
         private BufferedWriter outputStream;
         private ByteArrayOutputStream byteArrayOutputStream;
 
@@ -64,14 +64,14 @@ public class TCPIPPrintServer {
                 Log.d(TAG, String.format("listening on port = %d", serverSocketPort));
                 while (running) {
                     Log.d(TAG, "waiting for client");
-                    client = serverSocket.accept();
-                    Log.d(TAG, String.format("client connected from: %s", client.getRemoteSocketAddress().toString()));
+                    clientSocket = serverSocket.accept();
+                    Log.d(TAG, String.format("client connected from: %s", clientSocket.getRemoteSocketAddress().toString()));
                     // close Socket anyway after some time if inputStream.read() doesn't occur
                     // to prevent ServerSocket hanging out in forever waiting
-                    client.setSoTimeout(clientSocketTimeout);
+                    clientSocket.setSoTimeout(clientSocketTimeout);
 
-                    InputStream inputStream = client.getInputStream();
-                    outputStream = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+                    InputStream inputStream = clientSocket.getInputStream();
+                    outputStream = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                     byteArrayOutputStream = new ByteArrayOutputStream();
 
                     int readBytesAmount;
@@ -84,7 +84,7 @@ public class TCPIPPrintServer {
                     incomeDataProcessing();   // other variant is to collect all bytes and process them here
 
                     try {
-                        client.close();
+                        clientSocket.close();
                     } catch (Exception e) {
                         Crashlytics.logException(e);
                         e.printStackTrace();
@@ -97,7 +97,7 @@ public class TCPIPPrintServer {
                         outputStream.write("SocketTimeoutException (no data to receive)\n");
                         outputStream.flush();
                     }
-                    client.close();
+                    clientSocket.close();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -122,17 +122,17 @@ public class TCPIPPrintServer {
         }
 
         private boolean incomeDataProcessing() {
-            if (byteArrayOutputStream.size() > 0) {
-                String printResult = posPrinter.sendDataToPrinter(byteArrayOutputStream.toByteArray());
-                try {
-                    outputStream.write(printResult);
-                    outputStream.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;
+            if (byteArrayOutputStream.size() <= 0)
+                return false;
+
+            String printResult = posPrinter.sendDataToPrinter(byteArrayOutputStream.toByteArray());
+            try {
+                outputStream.write(printResult);
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            return false;
+            return true;
         }
     }
 
@@ -159,14 +159,9 @@ public class TCPIPPrintServer {
 
     private void callBindExceptionToast(final String message, int repeatTimes) {
         for (int i = 0; i < repeatTimes; i++) {
-
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                }
-            });
-
+            new Handler(Looper.getMainLooper()).post(
+                    () -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            );
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
