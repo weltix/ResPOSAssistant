@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.respos.android.assistant.R;
-import com.respos.android.assistant.device.POSPrinter;
+import com.respos.android.assistant.device.Printer;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -27,17 +27,17 @@ import static com.respos.android.assistant.Constants.TAG;
 
 public class TCPIPPrintServer {
     private Context context;
-    private POSPrinter posPrinter;
+    private Printer printer;
     private ServerSocket serverSocket;
     private int serverSocketPort;
     private int clientSocketTimeout;
     private boolean running = false;                        // флаг для проверки, запущен ли сервер
 
-    public TCPIPPrintServer(Context context, POSPrinter posPrinter, int serverSocketPort, int clientSocketTimeout) {
+    public TCPIPPrintServer(Context context, Printer printer, int serverSocketPort, int clientSocketTimeout) {
         this.context = context;
         this.serverSocketPort = serverSocketPort;
         this.clientSocketTimeout = clientSocketTimeout;
-        this.posPrinter = posPrinter;
+        this.printer = printer;
         createServerSocket();
     }
 
@@ -125,7 +125,7 @@ public class TCPIPPrintServer {
             if (byteArrayOutputStream.size() <= 0)
                 return false;
 
-            String printResult = posPrinter.sendDataToPrinter(byteArrayOutputStream.toByteArray());
+            String printResult = printer.sendDataToPrinter(byteArrayOutputStream.toByteArray());
             try {
                 outputStream.write(printResult);
                 outputStream.flush();

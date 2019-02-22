@@ -19,7 +19,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.ResPOSAssistantService" />
+        <service android:name=".service.ResPOSAssistantService">
+            <intent-filter>
+                <action android:name="com.respos.android.assistant.service.ResPOSAssistantService.ACTION_BIND" />
+            </intent-filter>
+        </service>
 
         <receiver android:name=".receiver.BootCompletedReceiver">
             <intent-filter>

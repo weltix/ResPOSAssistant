@@ -156,12 +156,11 @@ public class BytesUtil {
         try {
             Hashtable<EncodeHintType, String> hints = new Hashtable<EncodeHintType, String>();
             hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
-            //图像数据转换，使用了矩阵转换
+            //Image data conversion using matrix conversion
             BitMatrix bitMatrix = new QRCodeWriter().encode(data, BarcodeFormat.QR_CODE, size, size, hints);
             //System.out.println("bitmatrix height:" + bitMatrix.getHeight() + " width:" + bitMatrix.getWidth());
             return getBytesFromBitMatrix(bitMatrix);
         } catch (WriterException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;

@@ -6,12 +6,13 @@ import android.graphics.BitmapFactory;
 
 import com.respos.android.assistant.R;
 import com.respos.android.assistant.device.Indicator;
-import com.respos.android.assistant.device.POSPrinter;
+import com.respos.android.assistant.device.Printer;
 import com.respos.android.assistant.network.TCPIPPrintServer;
+import com.respos.android.assistant.service.ResPOSAssistantService;
 import com.respos.android.assistant.utils.AidlUtil;
 import com.respos.android.assistant.utils.ESCUtil;
 
-public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrinter, Indicator {
+public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Printer {
     private static final int INDICATOR_LINE_LENGTH = 16;
 
     private static final int SERVER_SOCKET_PORT = 9100;             // arbitrary port for inner printer
@@ -23,15 +24,21 @@ public class SunmiT1MiniG extends AndroidDeviceAbstractClass implements POSPrint
 
     public SunmiT1MiniG(Context context) {
         this.context = context;
-        if (true)
-            logoLCD = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_respos_market_128x40);
-        else if (false)
-            logoLCD = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_respos_restaurant_128x40);
     }
 
     @Override
     public void init() {
         AidlUtil.getInstance().connectPrinterService(context);
+
+        if (ResPOSAssistantService.resposPackageName != null) {
+            int resID;
+            if (ResPOSAssistantService.resposPackageName.contains("market"))
+                resID = R.drawable.logo_respos_market_128x40;
+            else
+                resID = R.drawable.logo_respos_restaurant_128x40;
+            logoLCD = BitmapFactory.decodeResource(context.getResources(), resID);
+        }
+
         if (printServer == null) {
             printServer = new TCPIPPrintServer(context, this, SERVER_SOCKET_PORT, CLIENT_SOCKET_TIMEOUT);
             printServer.runServer();

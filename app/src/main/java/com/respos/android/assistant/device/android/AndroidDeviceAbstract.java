@@ -3,18 +3,10 @@ package com.respos.android.assistant.device.android;
 import android.content.Context;
 import android.os.Build;
 
-public abstract class AndroidDeviceAbstractClass {
+import com.respos.android.assistant.device.AndroidDevice;
 
-    public static final String SUNMI_T1MINI_G = "SUNMI T1MINI-G";
-    public static final String CITAQ_H14 = "CITAQ H14";
-
-    public static final String ANDROID_DEVICE_NAME = AndroidDeviceAbstractClass.getDeviceName().toUpperCase();
-
-    Context context;
-
-    public abstract void init();
-
-    public abstract void finish();
+public abstract class AndroidDeviceAbstract implements AndroidDevice {
+    public static final String ANDROID_DEVICE_NAME = AndroidDeviceAbstract.getDeviceName().toUpperCase();
 
     private static String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;
@@ -37,4 +29,6 @@ public abstract class AndroidDeviceAbstractClass {
             return Character.toUpperCase(first) + s.substring(1);
         }
     }
+
+    Context context;
 }

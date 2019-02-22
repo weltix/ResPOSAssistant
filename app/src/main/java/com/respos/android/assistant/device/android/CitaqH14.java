@@ -3,9 +3,9 @@ package com.respos.android.assistant.device.android;
 import android.content.Context;
 
 import com.respos.android.assistant.device.Indicator;
-import com.respos.android.assistant.device.POSPrinter;
+import com.respos.android.assistant.device.Printer;
 
-public class CitaqH14 extends AndroidDeviceAbstractClass implements POSPrinter, Indicator {
+public class CitaqH14 extends AndroidDeviceAbstract implements Indicator, Printer {
     private static final int INDICATOR_LINE_LENGTH = 30;
 
     public CitaqH14(Context context) {
@@ -22,7 +22,7 @@ public class CitaqH14 extends AndroidDeviceAbstractClass implements POSPrinter, 
 
     @Override
     public String sendDataToPrinter(byte[] byteArray) {
-        return "";
+        return "\n";
     }
 
     @Override
@@ -33,5 +33,5 @@ public class CitaqH14 extends AndroidDeviceAbstractClass implements POSPrinter, 
     public int getIndicatorLineLength() {
         return INDICATOR_LINE_LENGTH;
     }
-    
+
 }

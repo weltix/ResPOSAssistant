@@ -433,8 +433,10 @@ public class AidlUtil {
         }
 
         try {
-            woyouService.sendLCDBitmap(bmp, null);
-            woyouService.sendLCDCommand(2);
+            if (bmp != null) {
+                woyouService.sendLCDBitmap(bmp, null);
+                woyouService.sendLCDCommand(2);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -443,13 +445,13 @@ public class AidlUtil {
 
     private void callToastPrinterUnavailable() {
         new Handler(Looper.getMainLooper()).post(
-                () -> Toast.makeText(context, R.string.toast_sunmi_printer_unavailable, Toast.LENGTH_LONG).show()
+                () -> Toast.makeText(context, context.getString(R.string.toast_sunmi_printer_unavailable), Toast.LENGTH_LONG).show()
         );
     }
 
     private void callToastIndicatorUnavailable() {
         new Handler(Looper.getMainLooper()).post(
-                () -> Toast.makeText(context, R.string.toast_sunmi_indicator_unavailable, Toast.LENGTH_LONG).show()
+                () -> Toast.makeText(context, context.getString(R.string.toast_sunmi_indicator_unavailable), Toast.LENGTH_LONG).show()
         );
     }
 }
