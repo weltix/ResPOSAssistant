@@ -399,6 +399,19 @@ public class AidlUtil {
         }
     }
 
+    public void sendLCDCommandClear() {
+        if (woyouService == null) {
+            callToastIndicatorUnavailable();
+            return;
+        }
+
+        try {
+            woyouService.sendLCDCommand(4);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendLCDCommandSleep() {
         if (woyouService == null) {
             callToastIndicatorUnavailable();
