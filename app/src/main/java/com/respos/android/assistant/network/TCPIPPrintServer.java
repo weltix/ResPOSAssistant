@@ -81,7 +81,7 @@ public class TCPIPPrintServer {
 //                        incomeDataProcessing();          // return true if any data was received, or false if input stream was empty
 //                        byteArrayOutputStream.reset();   // clear byteArrayOutputStream after every iteration
                     }
-                    incomeDataProcessing();   // other variant is to collect all bytes and process them here
+                    incomeDataProcessing();   // other variant is to collect all bytes and then handle them here
 
                     try {
                         clientSocket.close();
