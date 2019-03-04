@@ -24,6 +24,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
     private static final int INDICATOR_CHAR_WIDTH = 8;      // the best arbitrary width of one char (pixels)
     private static final int INDICATOR_WIDTH = 128;  // hardware physical dimension (pixels)
     private static final int INDICATOR_HEIGHT = 40;  // hardware physical dimension (pixels)
+    private static final boolean SHRINKABLE_IMAGE = false;    // image size for indicator is always stable and must be not less
 
     private static final int SERVER_SOCKET_PORT = 9100;             // arbitrary port for inner printer
     private static final int CLIENT_SOCKET_TIMEOUT = 500;           // arbitrary value sufficient for given case
@@ -31,7 +32,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
     private static final byte PRINTER_CHARSET_CP866 = (byte) 17;    // from printer's documentation
 
     private Bitmap logoLCD;
-    private BitmapMaker bitmapMaker;
+    private BitmapMaker indicatorBitmapMaker;
 
     public SunmiT1MiniG(Context context) {
         this.context = context;
@@ -51,7 +52,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
         }
 
         Bitmap charactersCP866Bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.characters_cp866);
-        bitmapMaker = new BitmapMaker(charactersCP866Bitmap, INDICATOR_CHAR_WIDTH);
+        indicatorBitmapMaker = new BitmapMaker(charactersCP866Bitmap, INDICATOR_CHAR_WIDTH);
 
         if (printServer == null) {
             printServer = new TCPIPPrintServer(context, this, SERVER_SOCKET_PORT, CLIENT_SOCKET_TIMEOUT);
@@ -94,8 +95,10 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
             e.printStackTrace();
         }
 
+        // TODO: 04.03.2019 Картинку должна быть возможность в будущем только уменьшить, не нарушив при этом минимум
+        // TODO: 04.03.2019 Если надо запас по высоте, то сразу посылать с запасом отсюда
         Bitmap initialBitmap = Bitmap.createBitmap(INDICATOR_WIDTH, INDICATOR_HEIGHT, ARGB_8888);
-        Bitmap outputBitmap = bitmapMaker.getOutputBitmap(initialBitmap, bytesData);
+        Bitmap outputBitmap = indicatorBitmapMaker.getOutputBitmap(initialBitmap, bytesData, SHRINKABLE_IMAGE);
 
         AidlUtil.getInstance().sendLCDBitmap(outputBitmap);
 /*        int lineLength = str.length() / 2;
