@@ -51,7 +51,7 @@ public class ResPOSAssistantService extends Service {
 
     private final Messenger serviceMessenger = new Messenger(new IncomingHandler());
     private Messenger clientMessenger = null;
-    private static final int MSG_CLIENT_PACKAGE_NAME = 0;
+    private static final int MSG_RESPOS_MODE = 0;
     private static final int MSG_INDICATOR_LINE_LENGTH = 1;
     private static final int MSG_DATA_TO_INDICATOR = 2;
 
@@ -59,9 +59,9 @@ public class ResPOSAssistantService extends Service {
         public void handleMessage(Message msg) {
             Bundle bundle;
             switch (msg.what) {
-                case MSG_CLIENT_PACKAGE_NAME:
+                case MSG_RESPOS_MODE:
                     bundle = msg.getData();
-                    resposPackageName = bundle.getString("packageName", "ekka.com.ua.respos_market");
+                    resposPackageName = bundle.getString("respos_mode", "ekka.com.ua.respos_market");
                     androidDevice.init();   // basically initInnerDevices to show logo on LCD Indicator
                     updateResPosAutoBootInfo();
                     break;
@@ -76,7 +76,7 @@ public class ResPOSAssistantService extends Service {
                     break;
                 case MSG_DATA_TO_INDICATOR:
                     bundle = msg.getData();
-                    String indicatorData = bundle.getString("dataToIndicator", "");
+                    String indicatorData = bundle.getString("data_to_indicator", "");
                     if (indicator != null)
                         indicator.sendDataToIndicator(indicatorData);
                     break;

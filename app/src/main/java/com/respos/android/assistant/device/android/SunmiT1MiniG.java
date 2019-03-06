@@ -22,9 +22,9 @@ import static com.respos.android.assistant.Constants.OPEN_DRAWER_TWO_TIMES;
 public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Printer {
     private static final int INDICATOR_LINE_LENGTH = 16;    // the best arbitrary number of chars in one line
     private static final int INDICATOR_CHAR_WIDTH = 8;      // the best arbitrary width of one char (pixels)
-    private static final int INDICATOR_WIDTH = 128;  // hardware physical dimension (pixels)
-    private static final int INDICATOR_HEIGHT = 40;  // hardware physical dimension (pixels)
-    private static final boolean SHRINKABLE_IMAGE = false;    // image size for indicator is always stable and must be not less
+    private static final int INDICATOR_WIDTH = 128;         // hardware physical dimension (pixels)
+    private static final int INDICATOR_HEIGHT = 40;         // hardware physical dimension (pixels)
+    private static final boolean IS_SHRINKABLE_IMAGE = false;  // image size for indicator is always stable and known initially  (false)
 
     private static final int SERVER_SOCKET_PORT = 9100;             // arbitrary port for inner printer
     private static final int CLIENT_SOCKET_TIMEOUT = 500;           // arbitrary value sufficient for given case
@@ -42,17 +42,19 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
     public void init() {
         AidlUtil.getInstance().connectPrinterService(context);
 
+        int resID = R.drawable.logo_respos_128x40;
         if (ResPOSAssistantService.resposPackageName != null) {
-            int resID;
             if (ResPOSAssistantService.resposPackageName.contains("market"))
-                resID = R.drawable.logo_respos_market_128x40;
+                resID = R.drawable.logo_respos_128x40_market;
             else
-                resID = R.drawable.logo_respos_restaurant_128x40;
-            logoLCD = BitmapFactory.decodeResource(context.getResources(), resID);
+                resID = R.drawable.logo_respos_128x40_restaurant;
         }
+        logoLCD = BitmapFactory.decodeResource(context.getResources(), resID);
 
-        Bitmap charactersCP866Bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.characters_cp866);
-        indicatorBitmapMaker = new BitmapMaker(charactersCP866Bitmap, INDICATOR_CHAR_WIDTH);
+        if (indicatorBitmapMaker == null) {
+            Bitmap charactersCP866Bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.characters_cp866);
+            indicatorBitmapMaker = new BitmapMaker(charactersCP866Bitmap, INDICATOR_CHAR_WIDTH);
+        }
 
         if (printServer == null) {
             printServer = new TCPIPPrintServer(context, this, SERVER_SOCKET_PORT, CLIENT_SOCKET_TIMEOUT);
@@ -95,10 +97,8 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
             e.printStackTrace();
         }
 
-        // TODO: 04.03.2019 Картинку должна быть возможность в будущем только уменьшить, не нарушив при этом минимум
-        // TODO: 04.03.2019 Если надо запас по высоте, то сразу посылать с запасом отсюда
         Bitmap initialBitmap = Bitmap.createBitmap(INDICATOR_WIDTH, INDICATOR_HEIGHT, ARGB_8888);
-        Bitmap outputBitmap = indicatorBitmapMaker.getOutputBitmap(initialBitmap, bytesData, SHRINKABLE_IMAGE);
+        Bitmap outputBitmap = indicatorBitmapMaker.getOutputBitmap(initialBitmap, IS_SHRINKABLE_IMAGE, bytesData);
 
         AidlUtil.getInstance().sendLCDBitmap(outputBitmap);
 /*        int lineLength = str.length() / 2;
@@ -107,7 +107,6 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
         Log.d(TAG, "SunmiT1MiniG.sendDataToIndicator=\"" + str1 + "\"+\"" + str2 + "\" lineLength=" + lineLength);
         AidlUtil.getInstance().sendLCDDoubleString(str1, str2); */
     }
-
 
     @Override
     public int getIndicatorLineLength() {
