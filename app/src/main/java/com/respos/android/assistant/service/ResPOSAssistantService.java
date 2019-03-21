@@ -54,6 +54,10 @@ public class ResPOSAssistantService extends Service {
     private static final int MSG_RESPOS_MODE = 0;
     private static final int MSG_INDICATOR_LINE_LENGTH = 1;
     private static final int MSG_DATA_TO_INDICATOR = 2;
+    private static final int MSG_COM_PORTS_LIST = 3;
+    private static final String KEY_RESPOS_MODE = "respos_mode";
+    private static final String DATA_TO_INDICATOR = "data_to_indicator";
+    private static final String COM_PORTS_LIST = "com_ports_list";
 
     private class IncomingHandler extends Handler {
         public void handleMessage(Message msg) {
@@ -61,7 +65,7 @@ public class ResPOSAssistantService extends Service {
             switch (msg.what) {
                 case MSG_RESPOS_MODE:
                     bundle = msg.getData();
-                    resposPackageName = bundle.getString("respos_mode", "ekka.com.ua.respos_market");
+                    resposPackageName = bundle.getString(KEY_RESPOS_MODE, "ekka.com.ua.respos_market");
                     androidDevice.init();   // basically initInnerDevices to show logo on LCD Indicator
                     updateResPosAutoBootInfo();
                     break;
@@ -76,10 +80,21 @@ public class ResPOSAssistantService extends Service {
                     break;
                 case MSG_DATA_TO_INDICATOR:
                     bundle = msg.getData();
-                    String indicatorData = bundle.getString("data_to_indicator", "");
+                    String indicatorData = bundle.getString(DATA_TO_INDICATOR, "");
                     if (indicator != null)
                         indicator.sendDataToIndicator(indicatorData);
                     break;
+                case MSG_COM_PORTS_LIST:
+                    clientMessenger = msg.replyTo;
+                    bundle = new Bundle();
+                    bundle.putStringArray(COM_PORTS_LIST , androidDevice.getCOMPortsList());
+                    Message msgAnswer = Message.obtain(null, MSG_COM_PORTS_LIST);
+                    msgAnswer.setData(bundle);
+                    try {
+                        clientMessenger.send(msgAnswer);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 default:
                     super.handleMessage(msg);
             }

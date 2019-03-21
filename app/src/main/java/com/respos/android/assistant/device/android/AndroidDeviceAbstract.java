@@ -7,6 +7,7 @@ import com.respos.android.assistant.device.AndroidDevice;
 
 public abstract class AndroidDeviceAbstract implements AndroidDevice {
     public static final String ANDROID_DEVICE_NAME = AndroidDeviceAbstract.getDeviceName().toUpperCase();
+    Context context;
 
     private static String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;
@@ -29,6 +30,4 @@ public abstract class AndroidDeviceAbstract implements AndroidDevice {
             return Character.toUpperCase(first) + s.substring(1);
         }
     }
-
-    Context context;
 }

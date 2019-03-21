@@ -14,4 +14,9 @@ public class AnotherAndroidDevice extends AndroidDeviceAbstract {
     @Override
     public void finish() {
     }
+
+    @Override
+    public String[] getCOMPortsList() {
+        return new String[0];
+    }
 }

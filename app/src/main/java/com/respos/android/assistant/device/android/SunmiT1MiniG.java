@@ -31,6 +31,8 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
     private static TCPIPPrintServer printServer = null;             // data to print we get from this TCP/IP Server
     private static final byte PRINTER_CHARSET_CP866 = (byte) 17;    // from printer's documentation
 
+    private static final String[] COM_PORTS_LIST = {"/dev/ttyHSL0", "/dev/ttyHSL1"};
+
     private Bitmap logoLCD;
     private BitmapMaker indicatorBitmapMaker;
 
@@ -111,6 +113,11 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
     @Override
     public int getIndicatorLineLength() {
         return INDICATOR_WIDTH / INDICATOR_CHAR_WIDTH;  // must be equal to INDICATOR_LINE_LENGTH
+    }
+
+    @Override
+    public String[] getCOMPortsList() {
+        return COM_PORTS_LIST;
     }
 
     // it is need some time to connect to AIDL service before init
