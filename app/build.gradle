@@ -23,8 +23,8 @@ android {
         applicationId "com.respos.android.assistant"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 1400000
-        versionName "0.0"
+        versionCode 1400110
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
