@@ -24,7 +24,7 @@ public class SunmiT1MiniG extends AndroidDeviceAbstract implements Indicator, Pr
     private static final int INDICATOR_CHAR_WIDTH = 8;      // the best arbitrary width of one char (pixels)
     private static final int INDICATOR_WIDTH = 128;         // hardware physical dimension (pixels)
     private static final int INDICATOR_HEIGHT = 40;         // hardware physical dimension (pixels)
-    private static final boolean IS_SHRINKABLE_IMAGE = false;  // image size for indicator is always stable and known initially  (false)
+    private static final boolean IS_SHRINKABLE_IMAGE = false;  // image size for indicator is always stable and known initially  (so = false)
 
     private static final int SERVER_SOCKET_PORT = 9100;             // arbitrary port for inner printer
     private static final int CLIENT_SOCKET_TIMEOUT = 500;           // arbitrary value sufficient for given case

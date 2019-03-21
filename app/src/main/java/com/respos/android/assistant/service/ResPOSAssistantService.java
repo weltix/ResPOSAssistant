@@ -52,9 +52,8 @@ public class ResPOSAssistantService extends Service {
     private final Messenger serviceMessenger = new Messenger(new IncomingHandler());
     private Messenger clientMessenger = null;
     private static final int MSG_RESPOS_MODE = 0;
-    private static final int MSG_INDICATOR_LINE_LENGTH = 1;
+    private static final int MSG_INITIAL_PARAMS = 1;
     private static final int MSG_DATA_TO_INDICATOR = 2;
-    private static final int MSG_COM_PORTS_LIST = 3;
     private static final String KEY_RESPOS_MODE = "respos_mode";
     private static final String DATA_TO_INDICATOR = "data_to_indicator";
     private static final String COM_PORTS_LIST = "com_ports_list";
@@ -69,11 +68,17 @@ public class ResPOSAssistantService extends Service {
                     androidDevice.init();   // basically initInnerDevices to show logo on LCD Indicator
                     updateResPosAutoBootInfo();
                     break;
-                case MSG_INDICATOR_LINE_LENGTH:
+                case MSG_INITIAL_PARAMS:
                     clientMessenger = msg.replyTo;
+                    int indicatorLineLength = 0;
+                    if (indicator != null)
+                        indicatorLineLength = indicator.getIndicatorLineLength();
+                    bundle = new Bundle();
+                    bundle.putStringArray(COM_PORTS_LIST, androidDevice.getCOMPortsList());
+                    Message msgAnswer = Message.obtain(null, MSG_INITIAL_PARAMS, indicatorLineLength, 0);
+                    msgAnswer.setData(bundle);
                     try {
-                        if (indicator != null)
-                            clientMessenger.send(Message.obtain(null, MSG_INDICATOR_LINE_LENGTH, indicator.getIndicatorLineLength(), 0));
+                        clientMessenger.send(msgAnswer);
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
@@ -84,17 +89,6 @@ public class ResPOSAssistantService extends Service {
                     if (indicator != null)
                         indicator.sendDataToIndicator(indicatorData);
                     break;
-                case MSG_COM_PORTS_LIST:
-                    clientMessenger = msg.replyTo;
-                    bundle = new Bundle();
-                    bundle.putStringArray(COM_PORTS_LIST , androidDevice.getCOMPortsList());
-                    Message msgAnswer = Message.obtain(null, MSG_COM_PORTS_LIST);
-                    msgAnswer.setData(bundle);
-                    try {
-                        clientMessenger.send(msgAnswer);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
                 default:
                     super.handleMessage(msg);
             }
