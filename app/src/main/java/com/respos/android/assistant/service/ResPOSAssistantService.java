@@ -183,7 +183,7 @@ public class ResPOSAssistantService extends Service {
             final PackageManager pm = getPackageManager();
             List<ApplicationInfo> apps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
             for (ApplicationInfo appInfo : apps) {
-                if (appInfo.packageName.contains("respos")) {
+                if (appInfo.packageName.contains("ekka.com.ua.respos")) {
                     resposPackageName = appInfo.packageName;
                     break;
                 }
