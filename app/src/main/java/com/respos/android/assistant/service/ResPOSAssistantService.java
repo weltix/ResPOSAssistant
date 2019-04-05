@@ -34,12 +34,14 @@ import com.respos.android.assistant.device.Indicator;
 import com.respos.android.assistant.device.android.AnotherAndroidDevice;
 import com.respos.android.assistant.device.android.CitaqH14;
 import com.respos.android.assistant.device.android.SunmiT1MiniG;
+import com.respos.android.assistant.device.android.UnknownHT518;
 
 import java.util.List;
 
 import static com.respos.android.assistant.Constants.RESPOS_PACKAGE_NAME;
 import static com.respos.android.assistant.device.AndroidDevice.CITAQ_H14;
 import static com.respos.android.assistant.device.AndroidDevice.SUNMI_T1MINI_G;
+import static com.respos.android.assistant.device.AndroidDevice.UNKNOWN_HT518;
 import static com.respos.android.assistant.device.android.AndroidDeviceAbstract.ANDROID_DEVICE_NAME;
 
 public class ResPOSAssistantService extends Service {
@@ -66,7 +68,6 @@ public class ResPOSAssistantService extends Service {
                     bundle = msg.getData();
                     resposPackageName = bundle.getString(KEY_RESPOS_MODE, "ekka.com.ua.respos_market");
                     androidDevice.init();   // basically initInnerDevices to show logo on LCD Indicator
-                    updateResPosAutoBootInfo();
                     break;
                 case MSG_INITIAL_PARAMS:
                     clientMessenger = msg.replyTo;
@@ -111,6 +112,9 @@ public class ResPOSAssistantService extends Service {
             case CITAQ_H14:
                 androidDevice = new CitaqH14(this);
                 break;
+            case UNKNOWN_HT518:
+                androidDevice = new UnknownHT518(this);
+                break;
             default:
                 androidDevice = new AnotherAndroidDevice(this);
                 break;
@@ -123,14 +127,12 @@ public class ResPOSAssistantService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createNotificationChannel();
         startForeground(NOTIFICATION_ID_1, notificationBuilder().build());
+        Toast.makeText(this, getString(R.string.notification_id_1_ticker), Toast.LENGTH_LONG).show();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, getString(R.string.notification_id_1_ticker), Toast.LENGTH_LONG).show();
-
-        updateResPosAutoBootInfo();
-
         return START_STICKY;
     }
 
@@ -176,6 +178,8 @@ public class ResPOSAssistantService extends Service {
             manager.createNotificationChannel(chan);
     }
 
+    // Previously was used to save the package name of last booted ResPOS in SharedPreferences
+    @Deprecated
     private void updateResPosAutoBootInfo() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String savedResposPackageName = sharedPref.getString(Constants.RESPOS_PACKAGE_NAME, null);
