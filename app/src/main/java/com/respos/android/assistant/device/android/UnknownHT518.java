@@ -7,6 +7,7 @@ package com.respos.android.assistant.device.android;
 import android.content.Context;
 
 // Unknown HT518 is handled in ekka.com.ua.respos_*
+@Deprecated
 public class UnknownHT518 extends AndroidDeviceAbstract {
 
     public UnknownHT518(Context context) {
