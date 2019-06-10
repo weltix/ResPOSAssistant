@@ -455,7 +455,6 @@ public class AidlUtil {
         }
     }
 
-
     private void callToastPrinterUnavailable() {
         new Handler(Looper.getMainLooper()).post(
                 () -> Toast.makeText(context, context.getString(R.string.toast_sunmi_printer_unavailable), Toast.LENGTH_LONG).show()
