@@ -23,8 +23,8 @@ android {
         applicationId "com.respos.android.assistant"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 1400000
-        versionName "0.0"
+        versionCode 1400120
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
@@ -36,6 +36,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled false
+            versionNameSuffix "-debug"
         }
     }
     compileOptions {
