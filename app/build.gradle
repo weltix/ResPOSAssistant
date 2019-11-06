@@ -4,27 +4,27 @@ apply plugin: 'io.fabric'
 android {
     signingConfigs {
         release {
-            keyAlias 'key0'
-            keyPassword '0987654321'
-            storeFile file('../app/res.jks')
-            storePassword '1234567890'
+            keyAlias 'keyAlias'
+            keyPassword '123456'
+            storeFile file('D:\\Projects\\KeyResonance\\.signing\\KeyStoreResonance.jks')
+            storePassword '123456'
         }
         debug {
-            keyAlias 'key0'
-            keyPassword '0987654321'
-            storeFile file('../app/res.jks')
-            storePassword '1234567890'
+            keyAlias 'keyAlias'
+            keyPassword '123456'
+            storeFile file('D:\\Projects\\KeyResonance\\.signing\\KeyStoreResonance.jks')
+            storePassword '123456'
         }
     }
 
-    compileSdkVersion 26
+    compileSdkVersion 28
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.respos.android.assistant"
         minSdkVersion 14
-        targetSdkVersion 26
-        versionCode 1400120
-        versionName "1.2"
+        targetSdkVersion 28
+        versionCode 1400121
+        versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
@@ -40,6 +40,7 @@ android {
         debug {
             minifyEnabled false
             versionNameSuffix "-debug"
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -50,11 +51,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.sunmi:sunmiui:latest.release'
     implementation 'com.google.firebase:firebase-core:16.0.7'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.0'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
